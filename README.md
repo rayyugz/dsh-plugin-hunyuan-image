@@ -1,269 +1,305 @@
-# 腾讯混元生图 · DSH 原生插件
+# Tencent Hunyuan Image Generation · Native DSH Plugin
 
-> 把腾讯混元的 **Hy-Image-3.5-preview** 与 **Hy-Image-3.0** 接入 [DSH（DeepSeek Harness）](https://deepseek.com)，
-> 提供生成面板、本地图库、官方两段式尺寸选择与批量生图。**零原生依赖，macOS / Windows / Linux 通用。**
+Languages: **English** · [简体中文](README.zh-CN.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Português](README.pt.md) · [Español](README.es.md) · [Русский](README.ru.md)
+
+> Bring Tencent Hunyuan's **Hy-Image-3.5-preview** and **Hy-Image-3.0** into
+> [DSH (DeepSeek Harness)](https://deepseek.com) — with a generation panel, local gallery,
+> the official two-step size picker and batch generation.
+> **Zero native dependencies. Runs on macOS, Windows and Linux.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Node: ≥20](https://img.shields.io/badge/Node-%E2%89%A520-green)](https://nodejs.org)
 [![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-blue)](#)
+[![CI](https://github.com/rayyugz/dsh-plugin-hunyuan-image/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
 
 ---
 
-## ✨ 功能
+## ✨ Features
 
-- **双模型**
-  - `hy-image-v3.5-preview`：Chat/Messages 协议，支持多模态输入、多轮编辑、思维链改写，最高 **4K（4096×4096）** 输出
-  - `hy-image-v3`：经典文生图，支持提示词自动改写与官方 37 组预设尺寸
-- **官方两段式尺寸选择**：**分辨率档位 × 比例**（与腾讯 TokenHub 网页端一致的交互），
-  插件自动换算为 API 所需的 `WxH`，并保证落在官方约束内（v3.5 边长 [256,8192]、面积 ≤ 16777216；v3.0 边长 [512,2048]、面积 ≤ 1048576）
-- **批量生图**：一次生成 **1 / 2 / 4 张**，并行发起，结果逐张展示并带 `1/4` 序号角标
-- **本地图库**
-  - 生图成功**自动入库**（纯 JS 的 JSON 存储，零原生依赖）
-  - 网格 / 列表两种视图，支持关键词搜索与按模型、时间范围筛选
-  - 缩略图 + 详情侧栏（提示词 / 模型 / 尺寸 / 时间 / 本地路径）
-  - **再次生图**：一键回填原提示词与参数
-  - 多选批量删除、删除时同步清理本地文件
-- **自定义图片保存路径**：默认 `~/Pictures/DSH-Hunyuan-Image`，可改为任意位置（建议非系统盘），
-  **改完立即生效、无需重启插件**；按 `<保存路径>/<年-月>/` 月份分桶归档，避免单目录堆积
-- **官方高级参数**（本次会话内有效，不做持久化）
-  - 生成种子 `seed`
-  - 水印脚注 `footnote`（≤16 字符，生成在图片右下角）
-  - 外部搜索增强 `use_search_tool`（仅 v3.5）
-  - 参考图面积上限 `resize_max_pixels`（仅 v3.5，控制大图带来的 token 消耗）
-  - 提示词自动改写 `revise`（仅 v3.0）
-- **参考图输入**：支持本地上传（自动转 data URL）与公网 URL
-- **模型可直调**：向 DSH 注册 `hunyuan_generate_image` 工具，对话中模型可自主调用生图
-- **图片永久保存**：腾讯返回的远程 URL 仅 12 小时有效，插件在生成成功时**立刻下载到本地**
+- **Two models**
+  - `hy-image-v3.5-preview` — Chat/Messages protocol; multimodal input, multi-turn editing,
+    chain-of-thought rewriting; up to **4K (4096×4096)** output
+  - `hy-image-v3` — classic text-to-image; prompt rewriting and the official 37 preset sizes
+- **Official two-step size picker** — **resolution tier × aspect ratio**, the same interaction as
+  the Tencent TokenHub web console. The plugin converts your choice into the `WxH` string the API
+  expects and guarantees it satisfies the official constraints
+  (v3.5: edges in [256, 8192], area ≤ 16,777,216; v3.0: edges in [512, 2048], area ≤ 1,048,576).
+  The UI shows the exact size that will be sent.
+- **Batch generation** — generate **1 / 2 / 4 images** in one request (issued in parallel);
+  results are shown one by one with a `1/4` index badge. Partial failures are reported explicitly.
+- **Local gallery**
+  - Every successful generation is **stored automatically** (plain-JS JSON storage — no SQLite, no native module)
+  - **Thumbnail grid** and list views
+  - **Keyword search** (matches the prompt and the rewritten prompt) plus filtering by model and time range
+  - **Detail drawer** with the full prompt, model, size, timestamp and local path
+  - **🔁 Generate again** — refills the original prompt and parameters in one click
+  - Multi-select **batch delete** (also removes the local files), copy prompt, copy image
+- **Customisable output folder** — defaults to `~/Pictures/DSH-Hunyuan-Image`, but you can point it
+  anywhere (a non-system drive is recommended). Clicking **"Choose…"** opens the native OS folder picker.
+  **Changes take effect immediately, no plugin restart needed.** Files are bucketed by month under
+  `<folder>/<YYYY-MM>/` to avoid piling thousands of files into one directory.
+- **Official advanced parameters** (session-scoped on purpose — see [Roadmap](#-known-limitations--roadmap))
 
-> 📌 **尚未实现的功能**见下方 [已知限制与路线图](#-已知限制与路线图)。
-> 本 README 只描述**当前版本实际可用**的能力。
+  | Parameter | Applies to | Description |
+  |---|---|---|
+  | Seed `seed` | both | Reproduce the same result |
+  | Watermark footnote `footnote` | both | ≤ 16 characters, rendered in the bottom-right corner |
+  | External search augmentation `use_search_tool` | v3.5 | Let the model search the web before drawing |
+  | Reference-image area cap `resize_max_pixels` | v3.5 | Caps the token cost of large (4K/6K) reference images |
+  | Automatic prompt rewriting `revise` | v3.0 | Adds ~11 s; recommended on by default |
+
+- **Reference images** — upload from disk (converted to a data URL) or pass a public URL.
+  v3.5 accepts up to 20 (≤ 20 MB each); v3.0 up to 3 (≤ 10 MB each).
+- **Callable by the model** — the plugin registers a **`hunyuan_generate_image`** tool, so you can
+  just say "draw a cat" in a conversation and the model will call it.
+- **Durable images** — Tencent's remote URLs expire after **12 hours**; the plugin downloads every
+  generated image to disk immediately, so gallery entries never break.
+
+> 📌 Unimplemented features are listed honestly in
+> [Known limitations & roadmap](#-known-limitations--roadmap).
+> This README only describes what the current version actually does.
 
 ---
 
-## 📦 安装
+## 📦 Installation
 
-### 方式一：从 Release 安装（推荐，不需要编译）
+### Option 1 — Install from the Release (recommended, no build step)
 
-1. 到本仓库的 [**Releases**](../../releases) 页面下载 `dsh-plugin-hunyuan-image-1.0.0.tgz`
-2. 解压到一个固定目录，例如 `~/dsh-plugins/`：
+1. Download `dsh-plugin-hunyuan-image-1.0.0.tgz` from the [**Releases**](../../releases) page.
+2. Extract it into a permanent folder, e.g. `~/dsh-plugins/`:
 
    ```bash
    mkdir -p ~/dsh-plugins
    tar -xzf dsh-plugin-hunyuan-image-1.0.0.tgz -C ~/dsh-plugins
    ```
 
-3. 在 DSH 的对话框里对 AI 说：
+3. In the DSH chat, tell the assistant:
 
-   > 请把 `~/dsh-plugins/package` 安装为 DSH 插件（用 plugin_manager 的 install_bundle）
+   > Please install `~/dsh-plugins/package` as a DSH plugin (use `plugin_manager` with `install_bundle`).
 
-4. 重启 DSH
+4. Restart DSH.
 
-> 更详细的重装 / 换机步骤见 [**INSTALL.md**](INSTALL.md)。
+> Step-by-step reinstall / new-machine instructions: [**INSTALL.md**](INSTALL.md)
+> (also available in [简体中文](INSTALL.zh-CN.md)).
 
-### 方式二：从源码构建（开发者）
+### Option 2 — Build from source (developers)
 
-需要 **Node ≥ 20** 与 **pnpm**。
+Requires **Node ≥ 20** and **pnpm**.
 
 ```bash
 git clone https://github.com/rayyugz/dsh-plugin-hunyuan-image.git
 cd dsh-plugin-hunyuan-image
 
 pnpm install
-pnpm build                        # 编译 host 半 + 打包 client 半
-node scripts/smoke-activate.mjs   # 冒烟测试，应输出「全部通过」
+pnpm build                        # compile the host half + bundle the client half
+node scripts/smoke-activate.mjs   # smoke test — should print "全部通过"
 
-# 链接到 DSH profile
+# Link into the DSH profile
 # macOS / Linux:
 ln -s "$(pwd)" ~/.dsh/profiles/desktop/node_modules/dsh-plugin-hunyuan-image
-# Windows（PowerShell，管理员）:
+# Windows (PowerShell, administrator):
 # New-Item -ItemType Junction -Path "$env:USERPROFILE\.dsh\profiles\desktop\node_modules\dsh-plugin-hunyuan-image" -Target "$PWD"
 ```
 
-然后把插件名加进 profile 的 `package.json`（`dependencies` 与 `dsh.profile.bundles` 两处），重启 DSH。
+Then add the plugin name to the profile's `package.json` (in both `dependencies` and
+`dsh.profile.bundles`) and restart DSH.
 
 ---
 
-## ⚙️ 配置
+## ⚙️ Configuration
 
-### 1. 获取 API Key
+### 1. Get an API Key
 
-1. 注册/登录 [腾讯云](https://cloud.tencent.com)
-2. 开通 [TokenHub 服务](https://console.cloud.tencent.com/tokenhub)
-3. 在 [API Key 管理页](https://console.cloud.tencent.com/tokenhub/apikey) 新建一个 Key
-4. 在 [在线推理-视觉模型](https://console.cloud.tencent.com/tokenhub/inference?regionId=1&serviceType=VISION) 开启 `hy-image-v3.5-preview` 与 `hy-image-v3` 的后付费
+1. Sign up / log in at [Tencent Cloud](https://cloud.tencent.com)
+2. Activate the [TokenHub service](https://console.cloud.tencent.com/tokenhub)
+3. Create a Key on the [API Key page](https://console.cloud.tencent.com/tokenhub/apikey) — it looks like `sk-...`
+4. Enable **pay-as-you-go** for `hy-image-v3.5-preview` and `hy-image-v3` under
+   [Online inference → Vision models](https://console.cloud.tencent.com/tokenhub/inference?regionId=1&serviceType=VISION)
 
-### 2. 在 DSH 里填配置
+### 2. Fill in the plugin settings
 
-打开 DSH → 右侧「混元生图」面板 → 右上角「⚙ 设置」：
+Open the plugin panel (**🖼 Hunyuan Image** button under the composer) → **Settings** tab:
 
-| 字段 | 说明 | 默认 |
+| Field | Description | Default |
 |---|---|---|
-| **API Key** | 上面获取的 Key | — |
-| **图片保存路径** | 用户自定义，建议非系统盘 | `~/Pictures/DSH-Hunyuan-Image` |
-| **默认模型** | `hy-image-v3.5-preview` 或 `hy-image-v3` | v3.5-preview |
-| **默认尺寸** | 见下方"尺寸说明" | `1024x1024` |
-| **默认方向** | 方形 / 横版 / 竖版 / 自定义 | 方形 |
-| **水印脚注** | ≤16 字符，生成在图片右下角 | 空 |
+| **API Key** | The Key created above | — |
+| **Output folder** | Anywhere you like; a non-system drive is recommended | `~/Pictures/DSH-Hunyuan-Image` |
+| **Default model** | `hy-image-v3.5-preview` or `hy-image-v3` | v3.5-preview |
+| **Default resolution** | See [Sizes](#-sizes) | `1K` |
+| **Default aspect ratio** | See [Sizes](#-sizes) | `1:1` |
+| **Watermark footnote** | ≤ 16 characters, bottom-right corner | empty |
 
-填完点「保存」→ 再点「🔌 测试连接」验证 Key 有效（会调 `listModels()`）。
+Click **Save**, then **🔌 Test connection** to verify the Key works.
+
+> ⚠️ **Note**: images are stored under a **month sub-folder**, e.g.
+> `AI-images/2026-10/1791629683045-xxxx.png` — not directly in the folder root.
 
 ---
 
-## 🖼 尺寸说明
+## 🖼 Sizes
 
-### Hy-Image-3.5-preview（推荐）
+The plugin mirrors the official TokenHub picker: pick a **resolution tier** and an **aspect ratio**.
 
-| 档位 | 范围 | 说明 |
+### Hy-Image-3.5-preview
+
+| Tier | Aspect ratios | Notes |
 |---|---|---|
-| 宽 × 高 | [256, 8192] | 任意尺寸 |
-| 面积 | ≤ 16,777,216（4K = 4096×4096）| 最高 4K 输出 |
-| 常用预设 | `1024x1024` / `2048x1024` / `1024x2048` / `4096x4096` | — |
-| 不传 size | 由模型按 prompt 语义自主决定（默认 1.5K 档） | — |
-| 面积档位（`generateMaxPixels`）| 1K (1048576) / 1.5K (2359296) / 2K (4194304) | 最高 2K；要 4K 必须传 `size` |
+| `1K` / `1.5K` / `2K` | `21:9` `16:9` `4:3` `1:1` `2:3` `3:2` `3:4` `9:16` | Area ≈ 1M / 2.36M / 4.19M px |
+| `4K` | same | Area ≤ 16,777,216 px; e.g. 16:9 → `5461x3072` |
+| `Auto` | — | No `size` is sent; the model decides |
 
 ### Hy-Image-3.0
 
-| 档位 | 范围 | 说明 |
+| Tier | Aspect ratios | Notes |
 |---|---|---|
-| 宽 × 高 | [512, 2048] | 37 组预设可选 |
-| 面积 | ≤ 1024×1024 | 不可超过 |
+| `720P` / `1K` | `1:1` `3:4` `4:3` `9:16` `16:9` `3:5` `5:3` | Must satisfy edges ∈ [512, 2048] and area ≤ 1,048,576 |
+| `Auto` | — | The model picks from the official 37 presets |
+
+**Rough size reference** (what actually gets sent):
+
+```
+v3.5  1K   16:9 = 1365x768      1:1 = 1024x1024
+      2K   16:9 = 2731x1536     1:1 = 2048x2048
+      4K   16:9 = 5461x3072     1:1 = 4096x4096
+v3.0  720P 16:9 = 1280x720      1:1 = 960x960
+      1K   16:9 = 1365x768      1:1 = 1024x1024
+```
+
+All 62 combinations are validated programmatically against the official constraints.
 
 ---
 
-## 📚 图库使用
+## 📚 Using the gallery
 
-| 操作 | 怎么用 |
+| Action | How |
 |---|---|
-| **搜索** | 顶部搜索框（debounce 300ms，匹配 prompt / 改写后提示词 / 关键词） |
-| **筛选** | 按模型、时间范围筛选 |
-| **多选** | 卡片左上角 checkbox，或 hover 浮层 |
-| **批量删除** | 选中后顶部出现批量操作条 |
-| **单图查看** | 卡片 hover 浮层，或点开详情侧栏 |
-| **再次生图** | 详情侧栏的 🔁 按钮，自动切回生成面板并回填提示词与参数 |
-| **复制提示词** | 详情侧栏的 📋 按钮，写入剪贴板 |
-| **复制图片** | 详情侧栏的 🖼 按钮，写入剪贴板（浏览器不支持 `ClipboardItem` 时降级为复制本地路径） |
+| **Search** | Search box at the top (300 ms debounce; matches prompt / rewritten prompt / keywords) |
+| **Filter** | By model, and by time range |
+| **Multi-select** | Checkbox on the card, or via the hover overlay |
+| **Batch delete** | Select items → the batch action bar appears at the top |
+| **Inspect one image** | Hover overlay, or open the detail drawer |
+| **Generate again** | 🔁 in the detail drawer — switches back to the generator and refills the prompt and parameters |
+| **Copy prompt** | 📋 in the detail drawer |
+| **Copy image** | 🖼 in the detail drawer (falls back to copying the local path when the browser lacks `ClipboardItem`) |
 
 ---
 
-## ⚠️ 已知限制与路线图
+## ⚠️ Known limitations & roadmap
 
-### 限制（受腾讯 API 或 DSH 宿主能力约束）
+### Limitations (imposed by the Tencent API or the DSH host)
 
-| 项 | 说明 |
+| Item | Detail |
 |---|---|
-| **远程图片 URL 有效期** | 仅 12 小时——本插件已**在生成成功时立刻下载到本地**，图库中的图片是永久的 |
-| **参考图大小** | v3.5 ≤ 20MB/张；v3.0 ≤ 10MB/张 |
-| **参考图数量** | v3.5 ≤ 20 张；v3.0 ≤ 3 张 |
-| **水印脚注** | ≤ 16 个 utf8 字符 |
-| **`generate_max_pixels` 最高 2K** | 要出更高分辨率必须用 `size` 精确指定（本插件通过「分辨率」档位实现） |
-| **多轮编辑** | 仅 v3.5 支持；本插件会保存服务端返回的 `assembled_history`，但尚未提供多轮编辑的界面入口 |
-| **高级参数不持久化** | 种子 / 水印以外的三个高级参数（外部搜索、参考图上限、自动改写）**仅在本次会话内有效**，重新打开面板会回到默认值。这是刻意设计，避免留下难以排查的隐藏状态 |
+| **Remote image URL lifetime** | Only 12 hours — this plugin downloads every image to disk immediately, so gallery entries are permanent |
+| **Reference image size** | v3.5 ≤ 20 MB each; v3.0 ≤ 10 MB each |
+| **Reference image count** | v3.5 ≤ 20; v3.0 ≤ 3 |
+| **Watermark footnote** | ≤ 16 UTF-8 characters |
+| **`generate_max_pixels` caps at 2K** | Higher resolutions must go through `size` (this plugin does that via the resolution tier) |
+| **Multi-turn editing** | v3.5 only. The plugin stores the server-returned `assembled_history`, but there is no UI for multi-turn editing yet |
+| **Advanced parameters are not persisted** | The external-search, reference-area-cap and rewrite toggles apply to the **current session only** and reset when the panel is reopened. This is deliberate — it avoids hidden state that is hard to diagnose later |
 
-### 尚未实现（路线图）
+### Not implemented yet
 
-| 功能 | 现状 | 原因 |
+| Feature | Status | Why |
 |---|---|---|
-| **对话中提到「图库」自动弹按钮** | ❌ 未实现 | 需要监听会话消息事件并在消息旁注入 Action Button，v1.0 未接入 |
-| **导出 / 另存为对话框** | ⚠️ 占位 | DSH 尚未向插件暴露「另存为」对话框；调用会返回明确原因而非静默失败 |
-| **微信 / 飞书分享** | ⚠️ 占位 | DSH 尚未向插件暴露 IM 分享通道；同上 |
-| **拖拽图片到对话** | ❌ 未实现 | 依赖 DSH 暴露拖拽事件 |
-| **多轮编辑界面** | ❌ 未实现 | 数据层已就绪（`assembledHistory`），缺 UI |
-| **DSH 官方插件市场** | ❌ 未发布 | 需 DSH 团队审核接入 |
+| **Auto "open gallery" button when you mention the gallery** | ❌ | Requires listening to session message events and injecting an action button; not wired up in v1.0 |
+| **Export / Save-as dialog** | ⚠️ stub | DSH does not expose a "save as" dialog to plugins yet; the call returns an explicit reason rather than failing silently |
+| **WeChat / Feishu sharing** | ⚠️ stub | DSH does not expose an IM sharing channel to plugins yet |
+| **Drag an image into the conversation** | ❌ | Depends on DSH exposing drag events |
+| **Multi-turn editing UI** | ❌ | The data layer is ready (`assembledHistory`); only the UI is missing |
+| **DSH official plugin marketplace** | ❌ | Requires review by the DSH team |
+| **Localised panel UI** | ❌ | The in-panel UI is currently **Chinese-only**; only the plugin title and description are localised (EN/ZH). These translated READMEs are a stopgap |
 
-欢迎通过 [Issue](../../issues) 反馈或提交 PR 一起完善。
+Feedback and pull requests are very welcome — please open an [Issue](../../issues).
 
 ---
 
-## 🛠 开发
+## 🛠 Development
 
-### 项目结构
+### Project layout
 
 ```
 dsh-plugin-hunyuan-image/
-├── package.json              # 插件 manifest（dsh.bundle.patch + dsh.client）
-├── cordis.patch.yml          # Cordis 加载器 patch：声明 host 插件行
-├── icon.svg / locale/        # 显示元数据（图标 + 中英标题/描述）
+├── package.json              # plugin manifest (dsh.bundle.patch + dsh.client)
+├── cordis.patch.yml          # Cordis loader patch: declares the host plugin row
+├── icon.svg / locale/        # display metadata (icon + EN/ZH title & description)
 ├── scripts/
-│   ├── build-client.mjs      # 把 TS/TSX 打包成 DSH 客户端模块表格式
-│   └── smoke-activate.mjs    # 激活冒烟测试（重启前先跑一遍）
+│   ├── build-client.mjs      # bundles TS/TSX into the DSH client module-table format
+│   └── smoke-activate.mjs    # activation smoke test (run before restarting DSH)
 ├── src/
-│   ├── server.ts             # ★ Host 半：Cordis 插件入口（apply + inject）
-│   ├── client.ts             # ★ Client 半：注册 composer dock + 面板浮层
-│   ├── types.ts              # 跨模块数据结构契约
-│   ├── size-presets.ts       # 分辨率档位 + 比例 → "WxH" 换算（含约束校验）
+│   ├── server.ts             # ★ Host half: Cordis plugin entry (apply + inject)
+│   ├── client.ts             # ★ Client half: registers the composer dock + panel overlay
+│   ├── types.ts              # cross-module data contracts
+│   ├── size-presets.ts       # resolution tier + aspect ratio → "WxH" (with constraint checks)
 │   ├── host/
-│   │   └── routes.ts         # Host HTTP 端点：/hunyuan/api/* 与 /hunyuan/file
+│   │   └── routes.ts         # host HTTP endpoints: /hunyuan/api/* and /hunyuan/file
 │   ├── client-services/
-│   │   ├── rpc.ts            # 前端 → host 的 fetch 封装
-│   │   ├── config-client.ts  # 配置缓存 + 更新
-│   │   ├── bus.ts            # 事件总线（目录选择、文件选择等真实接线）
-│   │   └── file-url.ts       # 本地图片 → 可加载 URL
+│   │   ├── rpc.ts            # client → host fetch wrapper
+│   │   ├── config-client.ts  # config cache + updates
+│   │   ├── bus.ts            # event bus (folder picker, file picker, …)
+│   │   └── file-url.ts       # local image path → loadable URL
 │   ├── services/
-│   │   ├── config.ts         # 配置持久化（JSON，原子写）
-│   │   ├── storage.ts        # 本地文件管理 + 图片下载（路径实时跟随配置）
-│   │   ├── hunyuan.ts        # 混元 API 网关（v3 + v3.5）
-│   │   └── gallery.ts        # JSON 图库（内存索引 + 原子写盘，无原生依赖）
+│   │   ├── config.ts         # config persistence (JSON, atomic write)
+│   │   ├── storage.ts        # local file management + image download (path follows config live)
+│   │   ├── hunyuan.ts        # Hunyuan API gateway (v3 + v3.5)
+│   │   └── gallery.ts        # JSON gallery (in-memory index + atomic write, no native deps)
 │   └── slots/
-│       ├── generator-panel.tsx   # 生成面板（浮层「生成」标签）
-│       ├── gallery-panel.tsx     # 图库面板（浮层「图库」标签）
-│       └── settings-panel.tsx    # 设置面板（浮层「设置」标签）
-├── README.md
+│       ├── generator-panel.tsx   # generator panel (overlay "Generate" tab)
+│       ├── gallery-panel.tsx     # gallery panel (overlay "Gallery" tab)
+│       └── settings-panel.tsx    # settings panel (overlay "Settings" tab)
+├── README.md + 7 translations (.zh-CN · .zh-TW · .ja · .ko · .pt · .es · .ru)
+├── INSTALL.md / INSTALL.zh-CN.md
 └── LICENSE
 ```
 
-### 架构要点
+### Architecture notes
 
-- **双 entry**：`dist/server.js` 是 Host 半（Node.js 进程），`dist/client.js` 是
-  Client 半（浏览器）。后者必须是 `window.__ModuleLoader__.load({id, factory})`
-  格式，由 `scripts/build-client.mjs` 用 esbuild 生成，并强制把 JSX 编译成
-  `React.createElement`（DSH 模块表只提供 `React`，不提供 `react/jsx-runtime`）。
-- **UI 入口**：客户端只注册一个 `conversation.composer.dock` 槽位（按钮），
-  点击后弹出包含「生成 / 图库 / 设置」三个标签的浮层。
-- **前后端通信**：Client 通过 `fetch('/hunyuan/api/<method>')` 调用 Host；
-  图片通过 `/hunyuan/file?path=<绝对路径>` 回送（只允许读取保存目录内的文件）。
-- **零原生依赖**：图库用 JSON 文件而非 SQLite，因此在 macOS 代码签名/强化运行时
-  下也能加载，并且 Windows / Linux 无需重新编译。
+- **Two entries**: `dist/server.js` is the Host half (Node.js process) and `dist/client.js` is the
+  Client half (browser). The latter must be in `window.__ModuleLoader__.load({id, factory})` format,
+  produced by `scripts/build-client.mjs` via esbuild; JSX is force-compiled to
+  `React.createElement` because the DSH module table provides `React` but **not** `react/jsx-runtime`.
+- **UI entry point**: the client registers a single `conversation.composer.dock` slot (a button).
+  Clicking it opens an overlay with three tabs: Generate / Gallery / Settings.
+- **Client ↔ host**: the client calls the host through `fetch('/hunyuan/api/<method>')`; images are
+  served back through `/hunyuan/file?path=<absolute path>` (restricted to files inside the
+  configured output folder, to prevent path traversal).
+- **Zero native dependencies**: the gallery is a JSON file rather than SQLite, so it loads fine under
+  the macOS code-signing / hardened-runtime restrictions of the DSH app, and needs no rebuild on
+  Windows or Linux.
 
-### 本地构建
+### Local build
 
 ```bash
 pnpm install
-pnpm build         # tsc → dist/
-pnpm test          # vitest
-pnpm lint          # tsc --noEmit
+pnpm build         # tsc → dist/ (host), esbuild → dist/client.js (client)
+pnpm typecheck     # tsc --noEmit
+node scripts/smoke-activate.mjs
 ```
 
-### 调试模式
+### Debug mode
 
-在 DSH 启动命令加 `--plugin-debug=hunyuan-image` 即可看到详细日志。
-
----
-
-## 🤝 贡献
-
-欢迎 issue 和 PR！
-
-- 🐛 发现 bug → [提 issue](https://github.com/rayyugz/dsh-plugin-hunyuan-image/issues/new?template=bug.md)
-- 💡 有新想法 → [提 feature request](https://github.com/rayyugz/dsh-plugin-hunyuan-image/issues/new?template=feature.md)
-- 🔧 修代码 → fork → PR
-
-### Roadmap
-
-- [ ] 多轮编辑可视化（v3.5 session 链路 UI）
-- [ ] 标签系统（用户自定义标签 + 自动从 prompt 提取）
-- [ ] 云端图库备份（可选 OSS/COS）
-- [ ] 接入其他腾讯系模型（如 hunyuan-vision）
+Start DSH with `--plugin-debug=hunyuan-image` for verbose logging.
 
 ---
 
-## 📄 许可证
+## 🤝 Contributing
+
+Issues and pull requests are welcome.
+
+- 🐛 Found a bug → [open a bug report](../../issues/new?template=bug.md)
+- 💡 Have an idea → [open a feature request](../../issues/new?template=feature.md)
+- 🔧 Sending code → fork, branch, PR
+
+---
+
+## 📄 License
 
 MIT © [rayyugz](https://github.com/rayyugz)
 
 ---
 
-## 🙏 致谢
+## 🙏 Acknowledgements
 
-- 腾讯混元团队提供 API
-- DSH 团队提供插件平台
-- 所有 issue 反馈者
+- The Tencent Hunyuan team for the API
+- The DSH team for the plugin platform
+- Everyone who files issues and helps improve this plugin

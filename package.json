@@ -45,7 +45,10 @@
     "icon.svg",
     "locale",
     "README.md",
+    "README.zh-CN.md",
     "INSTALL.md",
+    "INSTALL.zh-CN.md",
+    "CHANGELOG.md",
     "LICENSE"
   ],
   "icon": "./icon.svg",

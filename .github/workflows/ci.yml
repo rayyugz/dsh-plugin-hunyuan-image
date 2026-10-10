@@ -28,6 +28,9 @@ jobs:
       - name: 安装依赖
         run: pnpm install --frozen-lockfile
 
+      - name: 安全检查（拦截误提交的凭据与运行时数据）
+        run: node scripts/check-no-secrets.mjs --git-history
+
       - name: 类型检查
         run: pnpm typecheck
 

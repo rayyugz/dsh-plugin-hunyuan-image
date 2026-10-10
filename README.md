@@ -38,7 +38,7 @@ Languages: **English** · [简体中文](README.zh-CN.md) · [繁體中文](READ
   anywhere (a non-system drive is recommended). Clicking **"Choose…"** opens the native OS folder picker.
   **Changes take effect immediately, no plugin restart needed.** Files are bucketed by month under
   `<folder>/<YYYY-MM>/` to avoid piling thousands of files into one directory.
-- **Official advanced parameters** (session-scoped on purpose — see [Roadmap](#-known-limitations--roadmap))
+- **Official advanced parameters** (session-scoped on purpose — see [Roadmap](#️-known-limitations--roadmap))
 
   | Parameter | Applies to | Description |
   |---|---|---|
@@ -56,7 +56,7 @@ Languages: **English** · [简体中文](README.zh-CN.md) · [繁體中文](READ
   generated image to disk immediately, so gallery entries never break.
 
 > 📌 Unimplemented features are listed honestly in
-> [Known limitations & roadmap](#-known-limitations--roadmap).
+> [Known limitations & roadmap](#️-known-limitations--roadmap).
 > This README only describes what the current version actually does.
 
 ---

@@ -38,7 +38,7 @@ Languages: [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中
   a cualquier lugar (se recomienda una unidad que no sea la del sistema). Al hacer clic en **"Elegir…"** se abre el selector de carpetas nativo del sistema.
   **Los cambios surten efecto de inmediato, sin necesidad de reiniciar el plugin.** Los archivos se agrupan por mes en
   `<carpeta>/<AAAA-MM>/` para evitar acumular miles de archivos en un solo directorio.
-- **Parámetros avanzados oficiales** (deliberadamente limitados a la sesión — consulta la [Hoja de ruta](#-limitaciones-conocidas-y-hoja-de-ruta))
+- **Parámetros avanzados oficiales** (deliberadamente limitados a la sesión — consulta la [Hoja de ruta](#️-limitaciones-conocidas-y-hoja-de-ruta))
 
   | Parámetro | Se aplica a | Descripción |
   |---|---|---|
@@ -56,7 +56,7 @@ Languages: [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中
   imagen generada al disco de inmediato, así que las entradas de la galería nunca se rompen.
 
 > 📌 Las funciones no implementadas se listan con honestidad en
-> [Limitaciones conocidas y hoja de ruta](#-limitaciones-conocidas-y-hoja-de-ruta).
+> [Limitaciones conocidas y hoja de ruta](#️-limitaciones-conocidas-y-hoja-de-ruta).
 > Este README solo describe lo que la versión actual hace realmente.
 
 ---

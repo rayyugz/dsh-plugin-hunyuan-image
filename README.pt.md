@@ -38,7 +38,7 @@ Languages: [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中
   para qualquer local (recomenda-se uma unidade que não seja a do sistema). Clicar em **"Escolher…"** abre o seletor de pastas nativo do sistema.
   **As alterações entram em vigor imediatamente, sem reiniciar o plugin.** Os ficheiros são organizados por mês em
   `<pasta>/<AAAA-MM>/` para evitar acumular milhares de ficheiros numa única pasta.
-- **Parâmetros avançados oficiais** (limitados à sessão de propósito — ver [Roadmap](#-limitações-conhecidas-e-roadmap))
+- **Parâmetros avançados oficiais** (limitados à sessão de propósito — ver [Roadmap](#️-limitações-conhecidas-e-roadmap))
 
   | Parâmetro | Aplica-se a | Descrição |
   |---|---|---|
@@ -56,7 +56,7 @@ Languages: [English](README.md) · [简体中文](README.zh-CN.md) · [繁體中
   imediatamente para o disco cada imagem gerada, para que as entradas da galeria nunca se quebrem.
 
 > 📌 As funcionalidades não implementadas estão listadas com honestidade em
-> [Limitações conhecidas e roadmap](#-limitações-conhecidas-e-roadmap).
+> [Limitações conhecidas e roadmap](#️-limitações-conhecidas-e-roadmap).
 > Este README descreve apenas o que a versão atual faz realmente.
 
 ---

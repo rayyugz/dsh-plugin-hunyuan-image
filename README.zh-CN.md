@@ -263,8 +263,9 @@ dsh-plugin-hunyuan-image/
 - **Client ↔ Host**：客户端通过 `fetch('/hunyuan/api/<method>')` 调用宿主；图片
   通过 `/hunyuan/file?path=<绝对路径>` 回送（仅限配置的输出文件夹内的文件，
   以防路径穿越）。
-- **零原生依赖**：图库使用 JSON 文件而非 SQLite，因此在 DSH 应用的 macOS
-  代码签名 / 强化运行时限制下也能正常加载，并且在 Windows 或 Linux 上无需重新构建。
+- **零原生依赖**：图库是 JSON 文件而非 SQLite，因此在 DSH 应用的 macOS
+  代码签名 / 强化运行时限制下也能正常加载，并且
+  在 Windows 或 Linux 上无需重新构建。
 
 ### 本地构建
 

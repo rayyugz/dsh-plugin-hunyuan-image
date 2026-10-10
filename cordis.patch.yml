@@ -1,0 +1,9 @@
+# dsh-plugin-hunyuan-image bundle patch
+#
+# 此文件由 package.json 的 dsh.bundle.patch 字段引用，DSH 启动时加载。
+# 卸载时请让 `dsh plugin remove dsh-plugin-hunyuan-image` 自动清理，
+# 不要手工在 profile cordis.patch.yml 里追加这一行（与 bundle 二选一）。
+
+- insert:
+    - id: hunyuan-image
+      name: 'dsh-plugin-hunyuan-image'

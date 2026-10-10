@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="12" fill="#3b82f6"/>
+  <path d="M16 20h32v24H16z" stroke="#fff" stroke-width="2.5" fill="none"/>
+  <circle cx="24" cy="28" r="3" fill="#fff"/>
+  <path d="M16 40l8-8 6 6 6-4 12 8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <text x="32" y="56" font-family="-apple-system, sans-serif" font-size="6" fill="#fff" text-anchor="middle" font-weight="600">混元</text>
+</svg>

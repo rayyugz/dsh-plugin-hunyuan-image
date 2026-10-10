@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: 类型检查与构建
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: 安装 Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: 安装依赖
+        run: pnpm install --frozen-lockfile
+
+      - name: 类型检查
+        run: pnpm typecheck
+
+      - name: 构建（Host 半 + Client 半）
+        run: pnpm build
+
+      - name: 冒烟测试（激活链路）
+        run: node scripts/smoke-activate.mjs
+
+      - name: 校验产物存在
+        run: |
+          test -f dist/server.js || (echo "缺少 dist/server.js" && exit 1)
+          test -f dist/client.js || (echo "缺少 dist/client.js" && exit 1)
+          echo "产物齐全"

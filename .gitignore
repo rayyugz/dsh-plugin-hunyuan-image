@@ -1,0 +1,40 @@
+# 依赖
+node_modules/
+
+# 编译产物（CI 会重新构建）
+dist/
+*.tsbuildinfo
+
+# 打包产物
+*.tgz
+*.tar.gz
+
+# 运行时数据（插件运行时会写到 ~/.dsh/hunyuan-image/，不会落到仓库里）
+data/
+*.sqlite
+*.sqlite-journal
+*.db
+
+# 本地配置
+config.local.json
+.env
+.env.local
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 编辑器 / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 日志
+*.log
+npm-debug.log*
+pnpm-debug.log*

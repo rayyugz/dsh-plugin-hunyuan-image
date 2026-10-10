@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 腾讯混元 API 文档
+    url: https://cloud.tencent.com/document/product/1729
+    about: 关于 API 本身的问题（配额、计费、模型能力），请查阅官方文档
+  - name: TokenHub 控制台
+    url: https://console.cloud.tencent.com/tokenhub/apikey
+    about: 申请 API Key、开通模型后付费
